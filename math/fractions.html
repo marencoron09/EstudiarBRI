@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EstudiarBRI – Fraction Challenge</title>
+<style>
+:root{--ink:#17324d;--p:#5b5bd6;--ok:#18794e;--bad:#b42318;--line:#cbd5e1}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef3f8;color:var(--ink)}
+header{background:linear-gradient(135deg,#5154d8,#8174e8);color:#fff;text-align:center;padding:26px 15px}
+.wrap{max-width:980px;margin:auto;padding:16px}.info,.card,#score{background:#fff;border-radius:15px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #0001}
+.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--p);color:#fff;font-weight:bold;margin-right:8px}
+h2{font-size:19px;margin:0 0 15px}input,select{font-size:17px;padding:8px;border:2px solid var(--line);border-radius:8px;max-width:230px}
+.options label{display:block;margin:8px 0}.result{font-weight:bold;margin-top:10px}.correct{color:var(--ok)}.wrong{color:var(--bad)}
+.grid{display:grid;gap:3px;width:220px;margin:12px 0}.cell{height:55px;border:2px solid #41556d;background:#fff}.cell.shaded{background:#6875d8}.clickable .cell{cursor:pointer}
+.frac{display:inline-flex;flex-direction:column;text-align:center;font-weight:bold;font-size:21px;vertical-align:middle}.frac span:first-child{border-bottom:2px solid;padding:0 8px 3px}.frac span:last-child{padding-top:3px}
+.actions{text-align:center;margin:26px}.btn{border:0;border-radius:10px;padding:13px 20px;font-size:17px;font-weight:bold;cursor:pointer;margin:4px}.primary{background:var(--p);color:#fff}.secondary{background:#e3e8f0}
+#score{display:none;text-align:center;border:3px solid var(--p)}.big{font-size:44px;font-weight:bold;color:var(--p)}
+.match-area{position:relative;display:grid;grid-template-columns:190px 1fr 190px;align-items:stretch;max-width:760px;margin:18px auto;min-height:610px}
+.match-col{display:flex;flex-direction:column;justify-content:space-around;gap:10px;z-index:3}
+.match-gap{position:relative}.match-item{min-height:68px;padding:10px;background:#f5f7fb;border:2px solid #aebbd0;border-radius:10px;text-align:center;font-weight:bold;cursor:pointer;display:grid;place-items:center;user-select:none}
+.match-item.selected{border-color:var(--p);background:#e9eaff}.match-item.connected{background:#f0f3ff}
+#matchSvg{position:absolute;left:0;top:0;z-index:2;pointer-events:none;overflow:visible}
+.mini-grid{display:grid;gap:2px;width:110px}.mini-cell{height:27px;border:1px solid #52657b;background:#fff}.mini-cell.on{background:#6875d8}
+@media(max-width:650px){.match-area{grid-template-columns:130px 1fr 130px;min-height:650px}.mini-grid{width:90px}}
+</style></head>
+<body><header><h1>⭐ Fraction Challenge ⭐</h1><p>37 exercises • III BIMENSUAL • September 2026</p></header>
+<div class="wrap"><p><a href="../index.html" style="font-weight:bold;color:#5b5bd6;text-decoration:none">← Back to EstudiarBRI</a></p><div class="info"><b>Remember:</b> numerator = shaded/selected parts; denominator = total equal parts. If the numerator is 1, the fraction name is singular. If it is greater than 1, use plural. Special case: <b>one half → two halves</b>.<br><br><b>New practice:</b> the questions and several numbers are shuffled when you press <b>New Quiz</b>, so the test is not always the same.</div>
+<div id="quiz"><div class="card">Loading exercises...</div></div><div class="actions"><button class="btn primary" type="button" id="gradeBtn">Check My Work</button><button class="btn secondary" type="button" id="newQuizBtn">New Quiz</button></div><div id="score"></div></div>
+<script>
+const names={2:["half","halves"],3:["third","thirds"],4:["fourth","fourths"],5:["fifth","fifths"],6:["sixth","sixths"],8:["eighth","eighths"],9:["ninth","ninths"],10:["tenth","tenths"],12:["twelfth","twelfths"]};
+const nums=["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"];
+function wordFrac(n,d){return nums[n]+" "+names[d][n===1?0:1]}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function fracHTML(n,d){return `<span class="frac"><span>${n}</span><span>${d}</span></span>`}
+function grid(r,c,n,click=false){let h=`<div class="grid ${click?'clickable':''}" data-target="${n}" style="grid-template-columns:repeat(${c},1fr)">`;for(let i=0;i<r*c;i++)h+=`<div class="cell ${!click&&i<n?'shaded':''}"></div>`;return h+"</div>"}
+function makeQuestions(){
+ let q=[];
+ // 8 identify fraction from figure
+ [[1,2],[2,3],[3,4],[2,5],[4,6],[5,8],[5,9],[7,10]].forEach(([n,d])=>{let dims=d===4?[2,2]:d===6?[2,3]:d===8?[2,4]:d===9?[3,3]:d===10?[2,5]:[1,d];q.push({t:"identify",n,d,r:dims[0],c:dims[1]})});
+ // 5 numerator/denominator
+ shuffle([[2,5],[4,6],[3,8],[7,9],[5,12],[1,4],[6,10]]).slice(0,5).forEach(([n,d])=>q.push({t:"parts",n,d}));
+ // 5 names
+ shuffle([[1,2],[2,3],[3,4],[4,5],[2,6],[5,8],[7,9],[3,10],[1,12]]).slice(0,5).forEach(([n,d])=>q.push({t:"name",n,d}));
+ // 5 shade
+ shuffle([[1,2],[2,3],[3,4],[3,6],[5,8],[4,9],[7,10]]).slice(0,5).forEach(([n,d])=>{let dims=d===4?[2,2]:d===6?[2,3]:d===8?[2,4]:d===9?[3,3]:d===10?[2,5]:[1,d];q.push({t:"shade",n,d,r:dims[0],c:dims[1]})});
+ // 4 whole concepts
+ shuffle([2,3,4,8,9]).slice(0,4).forEach(d=>q.push({t:"whole",n:d,d}));
+ // 3 concepts
+ q.push({t:"choice",text:"What does the numerator tell us?",opts:["How many parts are selected or shaded","The total number of equal parts","The shape name"],a:"How many parts are selected or shaded"});
+ q.push({t:"choice",text:"What does the denominator tell us?",opts:["The total number of equal parts","Only the shaded parts","The color"],a:"The total number of equal parts"});
+ q.push({t:"choice",text:"Which fraction represents one whole?",opts:["3/4","6/6","2/3"],a:"6/6"});
+ return shuffle(q).slice(0,30);
+}
+let Q=[],links=[],selected=null;
+function renderQ(q,i){
+ let body="";
+ if(q.t==="identify")body=grid(q.r,q.c,q.n)+`<p>Fraction: <input data-a="${q.n}/${q.d}" placeholder="e.g. 3/4"></p>`;
+ if(q.t==="parts")body=`<p>${fracHTML(q.n,q.d)}</p><p>Numerator: <input data-a="${q.n}" style="width:75px"> Denominator: <input data-a="${q.d}" style="width:75px"></p>`;
+ if(q.t==="name")body=`<p>${fracHTML(q.n,q.d)}</p><p>Write in words: <input data-a="${wordFrac(q.n,q.d)}"></p>`;
+ if(q.t==="shade")body=grid(q.r,q.c,q.n,true)+`<p>Shade ${q.n}/${q.d} by clicking the equal parts.</p>`;
+ if(q.t==="whole")body=`<p>${fracHTML(q.n,q.d)}</p><p>Write the fraction in words: <input data-a="${wordFrac(q.n,q.d)}"></p><p>This is also called: <input data-a="one whole"></p>`;
+ if(q.t==="choice")body=`<div class="options">${q.opts.map(o=>`<label><input type="radio" name="q${i}" value="${o}" data-a="${q.a}"> ${o}</label>`).join("")}</div>`;
+ let title=q.t==="identify"?"What fraction of the figure is shaded?":q.t==="parts"?"Identify the numerator and denominator.":q.t==="name"?"Write the fraction in words.":q.t==="shade"?`Shade ${q.n}/${q.d} of the figure.`:q.t==="whole"?"Complete the fraction name and the whole.":q.text;
+ return `<section class="card" id="q${i}"><h2><span class="num">${i+1}</span>${title}</h2>${body}<div class="result"></div></section>`;
+}
+const matchPool=[[1,2],[2,3],[3,4],[2,5],[3,5],[4,6],[5,8],[4,8],[5,9],[7,9],[6,10],[7,10]];
+let M=[];
+function mini(n,d){let r=d===4?[2,2]:d===6?[2,3]:d===8?[2,4]:d===9?[3,3]:d===10?[2,5]:[1,d];let h=`<div class="mini-grid" style="grid-template-columns:repeat(${r[1]},1fr)">`;for(let i=0;i<d;i++)h+=`<div class="mini-cell ${i<n?'on':''}"></div>`;return h+"</div>"}
+function matchBlock(){
+ M=shuffle(matchPool).slice(0,7);let R=shuffle(M.map((x,i)=>i));
+ return `<section class="card" id="matchCard"><h2><span class="num">31–37</span>Match the fractions</h2><p>Click a fraction, then click the matching shaded figure.</p><div class="match-area" id="matchArea"><div class="match-col">${M.map((x,i)=>`<div class="match-item left" data-id="L${i}" data-key="${x[0]}/${x[1]}">${fracHTML(x[0],x[1])}</div>`).join("")}</div><div class="match-gap"></div><div class="match-col">${R.map((idx,j)=>`<div class="match-item right" data-id="R${j}" data-key="${M[idx][0]}/${M[idx][1]}">${mini(M[idx][0],M[idx][1])}</div>`).join("")}</div><svg id="matchSvg"></svg></div><button type="button" class="btn secondary" id="clearMatchesBtn">Clear matches</button><div class="result"></div></section>`;
+}
+function setupMatch(){
+document.querySelectorAll("#matchCard .match-item").forEach(function(e){e.addEventListener("click",function(){pick(e);});});
+document.querySelectorAll(".grid.clickable .cell").forEach(function(e){e.addEventListener("click",function(){e.classList.toggle("shaded");});});
+var clearBtn=document.getElementById("clearMatchesBtn"); if(clearBtn) clearBtn.addEventListener("click",clearMatches);
+requestAnimationFrame(function(){requestAnimationFrame(drawLines);});
+}
+function pick(e){let old=links.find(x=>x.l===e.dataset.id||x.r===e.dataset.id);if(old){links=links.filter(x=>x!==old);selected=null;refresh();drawLines();return}if(!selected){selected=e;e.classList.add("selected");return}if(selected.classList.contains("left")===e.classList.contains("left")){selected.classList.remove("selected");selected=e;e.classList.add("selected");return}let l=selected.classList.contains("left")?selected:e,r=selected.classList.contains("right")?selected:e;links.push({l:l.dataset.id,r:r.dataset.id,lk:l.dataset.key,rk:r.dataset.key});selected=null;refresh();drawLines()}
+function refresh(){document.querySelectorAll("#matchCard .match-item").forEach(e=>{e.classList.remove("selected","connected");if(links.some(x=>x.l===e.dataset.id||x.r===e.dataset.id))e.classList.add("connected")})}
+function drawLines(){let area=document.getElementById("matchArea"),svg=document.getElementById("matchSvg");if(!area||!svg)return;let ar=area.getBoundingClientRect();svg.setAttribute("width",ar.width);svg.setAttribute("height",ar.height);svg.style.width=ar.width+"px";svg.style.height=ar.height+"px";svg.innerHTML="";links.forEach(x=>{let a=document.querySelector(`[data-id="${x.l}"]`).getBoundingClientRect(),b=document.querySelector(`[data-id="${x.r}"]`).getBoundingClientRect();let ln=document.createElementNS("http://www.w3.org/2000/svg","line");ln.setAttribute("x1",a.right-ar.left);ln.setAttribute("y1",a.top+a.height/2-ar.top);ln.setAttribute("x2",b.left-ar.left);ln.setAttribute("y2",b.top+b.height/2-ar.top);ln.setAttribute("stroke","#5b5bd6");ln.setAttribute("stroke-width","3");ln.setAttribute("stroke-linecap","round");svg.appendChild(ln)})}
+function clearMatches(){links=[];selected=null;refresh();drawLines()}
+function norm(x){return(x||"").trim().toLowerCase().replace(/\s+/g," ")}
+function grade(){let score=0;Q.forEach((q,i)=>{let c=document.getElementById("q"+i),ok=false;if(q.t==="shade")ok=c.querySelectorAll(".cell.shaded").length===q.n;else if(q.t==="choice"){let e=c.querySelector("input:checked");ok=!!e&&norm(e.value)===norm(q.a)}else{let ins=[...c.querySelectorAll("input[data-a]")];ok=ins.every(e=>norm(e.value)===norm(e.dataset.a))}if(ok)score++;let r=c.querySelector(".result");r.className="result "+(ok?"correct":"wrong");r.textContent=ok?"✓ Correct!":"✗ Try this one again."});
+let ms=links.filter(x=>x.lk===x.rk).length;score+=ms;let mr=document.querySelector("#matchCard .result");mr.className="result "+(ms===7?"correct":"wrong");mr.textContent=ms===7?"✓ All 7 matches are correct!":`✗ ${ms}/7 matches are correct.`;
+let pct=Math.round(score/37*100),b=document.getElementById("score");b.style.display="block";b.innerHTML=`<div class="big">${score}/37</div><h2>${pct}%</h2><p>Matching: ${ms}/7</p>`;b.scrollIntoView({behavior:"smooth"})}
+function newQuiz(){Q=makeQuestions();links=[];selected=null;document.getElementById("quiz").innerHTML=Q.map(renderQ).join("")+matchBlock();document.getElementById("score").style.display="none";setupMatch();window.scrollTo({top:0,behavior:"smooth"})}
+window.addEventListener("resize",function(){requestAnimationFrame(drawLines);});
+document.getElementById("gradeBtn").addEventListener("click",grade);
+document.getElementById("newQuizBtn").addEventListener("click",newQuiz);
+newQuiz();
+</script></body></html>
