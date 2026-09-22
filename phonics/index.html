@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EstudiarBRI – Phonics & Language</title>
+<style>
+:root{--ink:#17324d;--p:#5b5bd6;--ok:#16835b;--bad:#c52b24;--line:#cbd5e1}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef3f8;color:var(--ink)}
+header{background:linear-gradient(135deg,#5154d8,#8174e8);color:white;text-align:center;padding:26px 15px}
+.wrap{max-width:980px;margin:auto;padding:16px}.info,.card,#score{background:#fff;border-radius:15px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #0001}
+.back{font-weight:bold;color:var(--p);text-decoration:none}.section{background:#e9eaff;border-radius:12px;padding:14px;margin-top:28px;font-size:22px}
+.n{display:inline-grid;place-items:center;width:34px;height:34px;background:var(--p);color:white;border-radius:50%;margin-right:8px}
+input{font-size:16px;padding:9px;border:2px solid var(--line);border-radius:8px;max-width:170px}.result{font-weight:bold;margin-top:10px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.match-area{position:relative;display:flex;justify-content:space-between;gap:100px;max-width:700px;margin:20px auto;min-height:520px;padding:5px 10px}
+.col{display:flex;flex-direction:column;justify-content:space-around;gap:10px;z-index:2;width:150px}.word{padding:11px 14px;background:#f5f7fb;border:2px solid #aebbd0;border-radius:9px;text-align:center;font-weight:bold;cursor:pointer;user-select:none}
+.word.selected{border-color:var(--p);background:#e9eaff}.word.connected{background:#f0f3ff}.matchsvg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.abbr{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:10px}.abbr label{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #e4e8ef;padding:6px}
+.divide-grid{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:12px}.divide-item{border:1px solid #e0e5ed;border-radius:10px;padding:12px}.divide-item b{font-size:18px}
+.actions{text-align:center;margin:25px}.btn{border:0;border-radius:10px;padding:13px 20px;font-size:17px;font-weight:bold;cursor:pointer;margin:4px;min-height:44px}.primary{background:var(--p);color:white}.secondary{background:#e2e7ef}.smallbtn{padding:8px 12px;font-size:14px}
+#score{display:none;text-align:center;border:3px solid var(--p)}.big{font-size:44px;font-weight:bold;color:var(--p)}
+@media(max-width:650px){.abbr,.divide-grid{grid-template-columns:1fr}.match-area{gap:35px}.col{width:120px}}
+</style></head>
+<body><header><h1>⭐ Phonics & Language Challenge ⭐</h1><p>III BIMENSUAL • September 2026</p></header>
+<div class="wrap"><p><a class="back" href="../index.html">← Back to EstudiarBRI</a></p>
+<div class="info"><b>Instructions:</b> The syllable exercises change order each time you start a new quiz. For Compound Words, click one word on the left and then its matching word on the right.</div>
+<div id="quiz"></div><div class="actions"><button type="button" class="btn primary" id="gradeBtn">Check My Work</button><button type="button" class="btn secondary" id="newBtn">New Quiz</button></div><div id="score"></div></div>
+<script>
+(function(){
+var pairs=[["back","pack"],["cow","boy"],["dragon","fly"],["eye","lash"],["gum","ball"],["jelly","bean"],["bed","time"],["rain","bow"],["cup","cake"],["snow","flake"]];
+var right=["cake","boy","bean","pack","flake","lash","bow","fly","time","ball"];
+var countPool=[["sprout","1"],["barnyard","2"],["duckling","2"],["birthday","2"],["branch","1"],["carpenter","3"],["whirlwind","2"],["napkin","2"],["basket","2"],["picnic","2"],["rabbit","2"],["helmet","2"],["magnet","2"],["kitten","2"],["pumpkin","2"],["sunset","2"],["tennis","2"],["market","2"],["winter","2"],["sandwich","2"]];
+var divisionPool=[["basket","bas|ket"],["picnic","pic|nic"],["napkin","nap|kin"],["rabbit","rab|bit"],["sunset","sun|set"],["helmet","hel|met"],["magnet","mag|net"],["tennis","ten|nis"],["kitten","kit|ten"],["pumpkin","pump|kin"],["market","mar|ket"],["winter","win|ter"],["sunny","sun|ny"],["muffin","muf|fin"],["button","but|ton"],["rabbit","rab|bit"],["letter","let|ter"],["basket","bas|ket"],["picnic","pic|nic"],["napkin","nap|kin"]];
+var months=[["January",["Jan.","Jan"]],["February",["Feb.","Feb"]],["March",["March"]],["April",["Apr.","Apr"]],["May",["May"]],["June",["June"]],["July",["July"]],["August",["Aug.","Aug"]],["September",["Sept.","Sept"]],["October",["Oct.","Oct"]],["November",["Nov.","Nov"]],["December",["Dec.","Dec"]]];
+var days=[["Sunday",["Sun.","Sun"]],["Monday",["Mon.","Mon"]],["Tuesday",["Tues.","Tues"]],["Wednesday",["Wed.","Wed"]],["Thursday",["Thurs.","Thurs"]],["Friday",["Fri.","Fri"]],["Saturday",["Sat.","Sat"]]];
+var links=[],selected=null,counts=[],divisions=[];
+function shuffle(a){var b=a.slice(),i,j,t;for(i=b.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=b[i];b[i]=b[j];b[j]=t}return b}
+function choose(pool,n){return shuffle(pool).slice(0,n)}
+function norm(x){return(x||"").trim().toLowerCase().replace(/\s/g,"")}
+function render(){
+counts=choose(countPool,10);divisions=choose(divisionPool,10);
+var h='<div class="section"><b>1. Match Compound Words – 10 matches</b></div><div class="card" id="matchCard"><h3><span class="n">1</span>Connect the words to make compound words.</h3><div class="match-area" id="matchArea"><div class="col">';
+pairs.forEach(function(p,i){h+='<button type="button" class="word left" data-id="L'+i+'" data-word="'+p[0]+'">'+p[0]+'</button>'});
+h+='</div><div class="col">';
+right.forEach(function(w,i){h+='<button type="button" class="word right" data-id="R'+i+'" data-word="'+w+'">'+w+'</button>'});
+h+='</div><svg class="matchsvg" id="matchSvg"></svg></div><button type="button" class="btn secondary smallbtn" id="clearBtn">Clear matches</button><div class="result"></div></div><div class="section"><b>2. Syllables – Count the syllables</b></div>';
+counts.forEach(function(x,i){h+='<div class="card countcard"><h3><span class="n">'+(i+2)+'</span>How many syllables are in <b>'+x[0]+'</b>?</h3><input data-a="'+x[1]+'" inputmode="numeric"><div class="result"></div></div>'});
+h+='<div class="section"><b>3. Divide the Words – 10 exercises</b><br><small>Type | where the word should be divided. Example: bas|ket</small></div><div class="card"><div class="divide-grid">';
+divisions.forEach(function(x,i){h+='<div class="divide-item"><b>'+(i+1)+'. '+x[0]+'</b><br><br><input class="dividein" data-a="'+x[1]+'" placeholder="Use | to divide"></div>'});
+h+='</div><div class="result"></div></div><div class="section"><b>4. Abbreviations – All 12 Months</b></div><div class="card"><div class="abbr">';
+months.forEach(function(x){h+='<label><b>'+x[0]+'</b><input class="month" data-a="'+x[1].join("~")+'" placeholder="Answer"></label>'});
+h+='</div><div class="result"></div></div><div class="section"><b>5. Abbreviations – All 7 Days</b></div><div class="card"><div class="abbr">';
+days.forEach(function(x){h+='<label><b>'+x[0]+'</b><input class="day" data-a="'+x[1].join("~")+'" placeholder="Answer"></label>'});
+h+='</div><div class="result"></div></div>';
+document.getElementById("quiz").innerHTML=h;links=[];selected=null;setupMatch();
+}
+function setupMatch(){
+var words=document.querySelectorAll(".word"),i;
+for(i=0;i<words.length;i++){words[i].addEventListener("click",function(){wordClick(this)})}
+document.getElementById("clearBtn").addEventListener("click",clearLinks);
+}
+function wordClick(el){
+var existing=null,i;
+for(i=0;i<links.length;i++){if(links[i].l===el.getAttribute("data-id")||links[i].r===el.getAttribute("data-id")){existing=links[i];break}}
+if(existing){links.splice(links.indexOf(existing),1);selected=null;refreshWords();drawLines();return}
+if(!selected){selected=el;el.classList.add("selected");return}
+if(selected.classList.contains("left")===el.classList.contains("left")){selected.classList.remove("selected");selected=el;el.classList.add("selected");return}
+var l=selected.classList.contains("left")?selected:el,r=selected.classList.contains("right")?selected:el;
+links.push({l:l.getAttribute("data-id"),r:r.getAttribute("data-id"),lw:l.getAttribute("data-word"),rw:r.getAttribute("data-word")});selected=null;refreshWords();drawLines();
+}
+function refreshWords(){var w=document.querySelectorAll(".word"),i,j,hit;for(i=0;i<w.length;i++){w[i].classList.remove("selected","connected");hit=false;for(j=0;j<links.length;j++){if(links[j].l===w[i].getAttribute("data-id")||links[j].r===w[i].getAttribute("data-id"))hit=true}if(hit)w[i].classList.add("connected")}}
+function drawLines(){var svg=document.getElementById("matchSvg");if(!svg)return;svg.innerHTML="";var area=document.getElementById("matchArea").getBoundingClientRect();links.forEach(function(x){var a=document.querySelector('[data-id="'+x.l+'"]').getBoundingClientRect(),b=document.querySelector('[data-id="'+x.r+'"]').getBoundingClientRect(),line=document.createElementNS("http://www.w3.org/2000/svg","line");line.setAttribute("x1",a.right-area.left);line.setAttribute("y1",a.top+a.height/2-area.top);line.setAttribute("x2",b.left-area.left);line.setAttribute("y2",b.top+b.height/2-area.top);line.setAttribute("stroke","#5b5bd6");line.setAttribute("stroke-width","3");svg.appendChild(line)})}
+function clearLinks(){links=[];selected=null;refreshWords();drawLines()}
+function fieldOK(e){var a=e.getAttribute("data-a").split("~").map(norm);return a.indexOf(norm(e.value))>=0}
+function grade(){
+var total=49,earned=0,cs=0,ss=0,vs=0,ms=0,ds=0,i;
+pairs.forEach(function(p){if(links.some(function(x){return x.lw===p[0]&&x.rw===p[1]})){earned++;cs++}});
+var mr=document.querySelector("#matchCard .result");mr.className="result "+(cs===10?"ok":"bad");mr.textContent=cs===10?"✓ All 10 compound words are correct!":"✗ "+cs+"/10 compound words are correct.";
+document.querySelectorAll(".countcard").forEach(function(c){var e=c.querySelector("input"),ok=fieldOK(e),r=c.querySelector(".result");if(ok){earned++;ss++}r.className="result "+(ok?"ok":"bad");r.textContent=ok?"✓ Correct!":"✗ Try this one again."});
+var divs=document.querySelectorAll(".dividein");divs.forEach(function(e){var ok=fieldOK(e);if(ok){earned++;vs++}e.style.borderColor=ok?"#16835b":"#c52b24"});var dr=divs[0].closest(".card").querySelector(".result");dr.className="result "+(vs===10?"ok":"bad");dr.textContent=vs===10?"✓ All divisions are correct!":"✗ "+vs+"/10 divisions are correct. Check the red boxes.";
+document.querySelectorAll(".month").forEach(function(e){var ok=fieldOK(e);if(ok){earned++;ms++}e.style.borderColor=ok?"#16835b":"#c52b24"});
+document.querySelectorAll(".day").forEach(function(e){var ok=fieldOK(e);if(ok){earned++;ds++}e.style.borderColor=ok?"#16835b":"#c52b24"});
+var pct=Math.round(earned/total*100),b=document.getElementById("score");b.style.display="block";b.innerHTML='<div class="big">'+earned+'/'+total+'</div><h2>'+pct+'%</h2><p><b>Compound Words:</b> '+cs+'/10 | <b>Syllable Count:</b> '+ss+'/10 | <b>Word Division:</b> '+vs+'/10<br><b>Months:</b> '+ms+'/12 | <b>Days:</b> '+ds+'/7</p>';b.scrollIntoView({behavior:"smooth"});
+}
+function newQuiz(){render();document.getElementById("score").style.display="none";window.scrollTo({top:0,behavior:"smooth"})}
+document.getElementById("gradeBtn").addEventListener("click",grade);
+document.getElementById("newBtn").addEventListener("click",newQuiz);
+window.addEventListener("resize",function(){window.requestAnimationFrame(drawLines)});
+render();
+})();
+</script></body></html>
