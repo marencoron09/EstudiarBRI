@@ -1,111 +1,85 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EstudiarBRI – Grammar</title>
 <style>
-:root{--ink:#17324d;--accent:#5b5bd6;--ok:#16835b;--bad:#c52b24;--soft:#eef3f8;--card:#fff;--muted:#66758a}
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:var(--soft);color:var(--ink)}
+:root{--ink:#17324d;--accent:#5b5bd6;--ok:#16835b;--bad:#c52b24;--soft:#eef3f8;--muted:#66758a}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--soft);color:var(--ink)}
 header{background:linear-gradient(135deg,#5154d8,#8174e8);color:white;text-align:center;padding:28px 15px}
-header h1{margin:0 0 7px}.wrap{max-width:950px;margin:auto;padding:16px}
-.back{font-weight:bold;color:var(--accent);text-decoration:none}
-.info,.card,#score{background:white;border-radius:15px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #00000012}
-.section{background:#e9eaff;border-radius:12px;padding:14px;margin-top:28px;font-size:21px}
-.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:white;margin-right:8px}
-input,select{font-size:16px;padding:10px;border:2px solid #cbd5e1;border-radius:9px;min-height:44px}
-input{width:min(250px,100%)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.prompt{font-size:18px;line-height:1.45}
-.result{font-weight:bold;margin-top:10px}.ok{color:var(--ok)}.bad{color:var(--bad)}
-.actions{text-align:center;margin:26px 0}
-button{border:0;border-radius:10px;padding:13px 20px;font-size:17px;font-weight:bold;cursor:pointer;min-height:44px;margin:4px}
-.primary{background:var(--accent);color:white}.secondary{background:#dfe5ed;color:var(--ink)}
+.wrap{max-width:950px;margin:auto;padding:16px}.back{font-weight:bold;color:var(--accent);text-decoration:none}
+.info,.card,#score{background:white;border-radius:15px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #0001}
+.section{background:#e9eaff;border-radius:12px;padding:14px;margin-top:28px;font-size:21px}.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:white;margin-right:8px}
+input{font-size:16px;padding:10px;border:2px solid #cbd5e1;border-radius:9px;min-height:44px;width:min(250px,100%)}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.prompt{font-size:18px;line-height:1.45}.result{font-weight:bold;margin-top:10px}.ok{color:var(--ok)}.bad{color:var(--bad)}.tip{color:var(--muted);font-size:14px}
+.actions{text-align:center;margin:26px 0}button{border:0;border-radius:10px;padding:13px 20px;font-size:17px;font-weight:bold;cursor:pointer;min-height:44px;margin:4px}.primary{background:var(--accent);color:white}.secondary{background:#dfe5ed;color:var(--ink)}
 #score{display:none;text-align:center;border:3px solid var(--accent)}.big{font-size:46px;font-weight:bold;color:var(--accent)}
-.tip{color:var(--muted);font-size:14px}
-@media(max-width:620px){.two{grid-template-columns:1fr}.prompt{font-size:17px}}
-</style>
-</head>
-<body>
-<header><h1>✏️ Grammar Challenge</h1><p>III BIMENSUAL • September 2026 • 30 exercises</p></header>
-<main class="wrap">
-<p><a class="back" href="../index.html">← Back to EstudiarBRI</a></p>
-<div class="info">
-<b>Topics:</b> Contractions • Singular to Plural • Subject and Verb<br>
-<span class="tip">There are 10 exercises in each section. Press <b>New Quiz</b> to change the order and some question variants.</span>
-</div>
-<div id="quiz"></div>
-<div class="actions"><button class="primary" id="checkBtn" type="button">Check My Work</button><button class="secondary" id="newBtn" type="button">New Quiz</button></div>
-<div id="score"></div>
-</main>
+.match-area{position:relative;display:flex;justify-content:space-between;gap:90px;max-width:760px;min-height:390px;margin:18px auto;padding:5px 10px}
+.match-col{display:flex;flex-direction:column;justify-content:space-around;gap:9px;width:230px;z-index:2;min-width:0}
+.match-word{background:#f6f8fb;border:2px solid #aebbd0;color:var(--ink);padding:10px 8px;border-radius:9px;font-size:15px;font-weight:bold;cursor:pointer;min-height:44px;overflow-wrap:anywhere}
+.match-word.selected{border-color:var(--accent);background:#e9eaff}.match-word.connected{background:#f0f3ff}
+.match-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+@media(max-width:620px){.two{grid-template-columns:1fr}.match-area{gap:28px}.match-col{width:42%}.match-word{font-size:14px;padding:8px 5px}.prompt{font-size:17px}}
+</style></head>
+<body><header><h1>✏️ Grammar Challenge</h1><p>III BIMENSUAL • September 2026 • 51 exercises</p></header>
+<main class="wrap"><p><a class="back" href="../index.html">← Back to EstudiarBRI</a></p>
+<div class="info"><b>Topics:</b> Contractions • Singular to Plural • Subject and Verb<br><span class="tip">30 regular exercises + three separate matching activities with 7 matches each. Press <b>New Quiz</b> for a new order and question variants.</span></div>
+<div id="quiz"></div><div class="actions"><button class="primary" id="checkBtn" type="button">Check My Work</button><button class="secondary" id="newBtn" type="button">New Quiz</button></div><div id="score"></div></main>
 <script>
 (function(){
 var contractionPool=[
- {q:"Write the contraction for: <b>cannot</b>",a:["can't"]},
- {q:"Write the contraction for: <b>was not</b>",a:["wasn't"]},
- {q:"Write the contraction for: <b>they are</b>",a:["they're"]},
- {q:"Write the contraction for: <b>you are</b>",a:["you're"]},
- {q:"Write the contraction for: <b>has not</b>",a:["hasn't"]},
- {q:"Write the contraction for: <b>will not</b>",a:["won't"]},
- {q:"Write the contraction for: <b>do not</b>",a:["don't"]},
- {q:"Write the contraction for: <b>it is</b>",a:["it's"]},
- {q:"Write the two words that make: <b>we're</b>",a:["we are"]},
- {q:"Write the two words that make: <b>aren't</b>",a:["are not"]},
- {q:"Write the two words that make: <b>should've</b>",a:["should have"]},
- {q:"Write the two words that make: <b>we've</b>",a:["we have"]},
- {q:"Write the two words that make: <b>you're</b>",a:["you are"]},
- {q:"Complete: <b>___ going to enjoy the story.</b> (you are)",a:["you're"]},
- {q:"Complete: <b>___ a beautiful bird.</b> (it is)",a:["it's"]}
+["Write the contraction for: <b>cannot</b>","can't"],["Write the contraction for: <b>was not</b>","wasn't"],["Write the contraction for: <b>they are</b>","they're"],["Write the contraction for: <b>you are</b>","you're"],["Write the contraction for: <b>has not</b>","hasn't"],["Write the contraction for: <b>will not</b>","won't"],["Write the contraction for: <b>do not</b>","don't"],["Write the contraction for: <b>it is</b>","it's"],["Write the two words that make: <b>we're</b>","we are"],["Write the two words that make: <b>aren't</b>","are not"],["Write the two words that make: <b>should've</b>","should have"],["Write the two words that make: <b>we've</b>","we have"],["Write the two words that make: <b>you're</b>","you are"],["Complete: <b>___ going to enjoy the story.</b> (you are)","you're"],["Complete: <b>___ a beautiful bird.</b> (it is)","it's"]];
+var pluralPool=[["swamp","swamps"],["choice","choices"],["butterfly","butterflies"],["house","houses"],["gorilla","gorillas"],["shoe","shoes"],["baby","babies"],["puppy","puppies"],["story","stories"],["toy","toys"],["day","days"],["monkey","monkeys"],["book","books"],["tree","trees"],["bird","birds"]];
+var svPool=[["Hunter dug worms for his fishing trip.","Hunter","dug"],["His father helped him.","father","helped"],["Two worms squirmed out of the can.","worms","squirmed"],["Hunter snapped the lid on tight.","Hunter","snapped"],["I love fishing!","I","love"],["Today, we played in the snow.","we","played"],["Max and I rolled the snow into big balls.","Max and I","rolled"],["Carefully, Dad lifted one ball onto another.","Dad","lifted"],["Next, Michael found rocks for the eyes and mouth.","Michael","found"],["Mom gave us a carrot for the nose.","Mom","gave"],["Brent gave us an old hat and scarf.","Brent","gave"],["Together, we made a great snowman!","we","made"],["The spider monkey lives in the jungle trees.","spider monkey","lives"],["Green anaconda snakes are very long.","Green anaconda snakes","are"],["A black caiman eats animals.","black caiman","eats"]];
+var matchSets=[
+{title:"Contractions — Match each set of words to its contraction",pairs:[["cannot","can't"],["was not","wasn't"],["they are","they're"],["you are","you're"],["has not","hasn't"],["will not","won't"],["do not","don't"]]},
+{title:"Singular & Plural — Match each singular noun to its plural",pairs:[["butterfly","butterflies"],["choice","choices"],["house","houses"],["baby","babies"],["toy","toys"],["gorilla","gorillas"],["shoe","shoes"]]},
+{title:"Subject & Verb — Match each subject to the correct verb",pairs:[["Hunter","dug"],["His father","helped"],["Two worms","squirmed"],["Dad","lifted"],["Michael","found"],["Mom","gave"],["The spider monkey","lives"]]}
 ];
-var pluralPool=[
- ["swamp","swamps"],["choice","choices"],["butterfly","butterflies"],["house","houses"],["gorilla","gorillas"],
- ["shoe","shoes"],["baby","babies"],["puppy","puppies"],["story","stories"],["toy","toys"],
- ["day","days"],["monkey","monkeys"],["book","books"],["tree","trees"],["bird","birds"]
-];
-var svPool=[
- ["Hunter dug worms for his fishing trip.","Hunter","dug"],
- ["His father helped him.","father","helped"],
- ["Two worms squirmed out of the can.","worms","squirmed"],
- ["Hunter snapped the lid on tight.","Hunter","snapped"],
- ["I love fishing!","I","love"],
- ["Today, we played in the snow.","we","played"],
- ["Max and I rolled the snow into big balls.","Max and I","rolled"],
- ["Carefully, Dad lifted one ball onto another.","Dad","lifted"],
- ["Next, Michael found rocks for the eyes and mouth.","Michael","found"],
- ["Mom gave us a carrot for the nose.","Mom","gave"],
- ["Brent gave us an old hat and scarf.","Brent","gave"],
- ["Together, we made a great snowman!","we","made"],
- ["The spider monkey lives in the jungle trees.","spider monkey","lives"],
- ["Green anaconda snakes are very long.","Green anaconda snakes","are"],
- ["A black caiman eats animals.","black caiman","eats"]
-];
-var contractions=[],plurals=[],sv=[];
+var contractions=[],plurals=[],sv=[],matchStates=[[],[],[]],selected=[null,null,null];
 function shuffle(a){var b=a.slice(),i,j,t;for(i=b.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=b[i];b[i]=b[j];b[j]=t}return b}
-function norm(s){return (s||"").trim().toLowerCase().replace(/[’]/g,"'").replace(/\s+/g," ")}
+function norm(s){return(s||"").trim().toLowerCase().replace(/[’]/g,"'").replace(/\s+/g," ")}
+function matchHTML(set,k){
+var right=shuffle(set.pairs.map(function(p){return p[1]})),h='<div class="section"><b>Matching '+(k+1)+': '+set.title+' — 7 matches</b></div><div class="card match-card" data-k="'+k+'"><div class="match-area" id="area'+k+'"><div class="match-col">';
+set.pairs.forEach(function(p,i){h+='<button type="button" class="match-word left" data-k="'+k+'" data-side="l" data-id="L'+k+'-'+i+'" data-word="'+p[0]+'">'+p[0]+'</button>'});
+h+='</div><div class="match-col">';
+right.forEach(function(w,i){h+='<button type="button" class="match-word right" data-k="'+k+'" data-side="r" data-id="R'+k+'-'+i+'" data-word="'+w+'">'+w+'</button>'});
+h+='</div><svg class="match-svg" id="svg'+k+'"></svg></div><button type="button" class="secondary clearMatch" data-k="'+k+'">Clear matches</button><div class="result"></div></div>';return h}
 function render(){
- contractions=shuffle(contractionPool).slice(0,10);
- plurals=shuffle(pluralPool).slice(0,10);
- sv=shuffle(svPool).slice(0,10);
- var h='<div class="section"><b>1. Contractions — 10 exercises</b></div>';
- contractions.forEach(function(x,i){h+='<div class="card item"><div class="prompt"><span class="num">'+(i+1)+'</span>'+x.q+'</div><p><input class="answer" data-a="'+x.a.join("~").replace(/"/g,"&quot;")+'" autocomplete="off"></p><div class="result"></div></div>'});
- h+='<div class="section"><b>2. Change Singular to Plural — 10 exercises</b></div>';
- plurals.forEach(function(x,i){h+='<div class="card item"><div class="prompt"><span class="num">'+(i+11)+'</span>Change <b>'+x[0]+'</b> to a plural noun.</div><p><input class="answer" data-a="'+x[1]+'" autocomplete="off"></p><div class="result"></div></div>'});
- h+='<div class="section"><b>3. Subject and Verb — 10 exercises</b></div>';
- sv.forEach(function(x,i){h+='<div class="card svitem"><div class="prompt"><span class="num">'+(i+21)+'</span><b>'+x[0]+'</b></div><p class="tip">Write the subject and the verb.</p><div class="two"><label>Subject<br><input class="subject" data-a="'+x[1]+'" autocomplete="off"></label><label>Verb<br><input class="verb" data-a="'+x[2]+'" autocomplete="off"></label></div><div class="result"></div></div>'});
- document.getElementById("quiz").innerHTML=h;
- document.getElementById("score").style.display="none";
+contractions=shuffle(contractionPool).slice(0,10);plurals=shuffle(pluralPool).slice(0,10);sv=shuffle(svPool).slice(0,10);matchStates=[[],[],[]];selected=[null,null,null];
+var h='<div class="section"><b>1. Contractions — 10 exercises</b></div>';
+contractions.forEach(function(x,i){h+='<div class="card item"><div class="prompt"><span class="num">'+(i+1)+'</span>'+x[0]+'</div><p><input class="answer" data-a="'+x[1].replace(/"/g,"&quot;")+'"></p><div class="result"></div></div>'});
+h+=matchHTML(matchSets[0],0);
+h+='<div class="section"><b>2. Change Singular to Plural — 10 exercises</b></div>';
+plurals.forEach(function(x,i){h+='<div class="card item"><div class="prompt"><span class="num">'+(i+11)+'</span>Change <b>'+x[0]+'</b> to a plural noun.</div><p><input class="answer" data-a="'+x[1]+'"></p><div class="result"></div></div>'});
+h+=matchHTML(matchSets[1],1);
+h+='<div class="section"><b>3. Subject and Verb — 10 exercises</b></div>';
+sv.forEach(function(x,i){h+='<div class="card svitem"><div class="prompt"><span class="num">'+(i+21)+'</span><b>'+x[0]+'</b></div><p class="tip">Write the subject and the verb.</p><div class="two"><label>Subject<br><input class="subject" data-a="'+x[1]+'"></label><label>Verb<br><input class="verb" data-a="'+x[2]+'"></label></div><div class="result"></div></div>'});
+h+=matchHTML(matchSets[2],2);
+document.getElementById("quiz").innerHTML=h;setupMatches();document.getElementById("score").style.display="none";
 }
-function checkOne(el){var answers=el.getAttribute("data-a").split("~"),v=norm(el.value),ok=false;answers.forEach(function(a){if(v===norm(a))ok=true});el.style.borderColor=ok?"#16835b":"#c52b24";return ok}
+function setupMatches(){
+document.querySelectorAll(".match-word").forEach(function(el){el.addEventListener("click",function(){pick(el)})});
+document.querySelectorAll(".clearMatch").forEach(function(b){b.addEventListener("click",function(){clearMatch(parseInt(b.getAttribute("data-k"),10))})});
+}
+function pick(el){
+var k=parseInt(el.getAttribute("data-k"),10),id=el.getAttribute("data-id"),i,found=-1;
+for(i=0;i<matchStates[k].length;i++){if(matchStates[k][i].l===id||matchStates[k][i].r===id){found=i;break}}
+if(found>=0){matchStates[k].splice(found,1);selected[k]=null;refresh(k);draw(k);return}
+if(!selected[k]){selected[k]=el;el.classList.add("selected");return}
+if(selected[k].getAttribute("data-side")===el.getAttribute("data-side")){selected[k].classList.remove("selected");selected[k]=el;el.classList.add("selected");return}
+var l=selected[k].getAttribute("data-side")==="l"?selected[k]:el,r=selected[k].getAttribute("data-side")==="r"?selected[k]:el;
+matchStates[k].push({l:l.getAttribute("data-id"),r:r.getAttribute("data-id"),lw:l.getAttribute("data-word"),rw:r.getAttribute("data-word")});selected[k]=null;refresh(k);draw(k);
+}
+function refresh(k){document.querySelectorAll('.match-word[data-k="'+k+'"]').forEach(function(el){el.classList.remove("selected","connected");var id=el.getAttribute("data-id"),hit=matchStates[k].some(function(x){return x.l===id||x.r===id});if(hit)el.classList.add("connected")})}
+function draw(k){var svg=document.getElementById("svg"+k),area=document.getElementById("area"+k);if(!svg||!area)return;svg.innerHTML="";var ar=area.getBoundingClientRect();matchStates[k].forEach(function(x){var a=document.querySelector('[data-id="'+x.l+'"]').getBoundingClientRect(),b=document.querySelector('[data-id="'+x.r+'"]').getBoundingClientRect(),line=document.createElementNS("http://www.w3.org/2000/svg","line");line.setAttribute("x1",a.right-ar.left);line.setAttribute("y1",a.top+a.height/2-ar.top);line.setAttribute("x2",b.left-ar.left);line.setAttribute("y2",b.top+b.height/2-ar.top);line.setAttribute("stroke","#5b5bd6");line.setAttribute("stroke-width","3");svg.appendChild(line)})}
+function clearMatch(k){matchStates[k]=[];selected[k]=null;refresh(k);draw(k)}
+function checkInput(el){var ok=norm(el.value)===norm(el.getAttribute("data-a"));el.style.borderColor=ok?"#16835b":"#c52b24";return ok}
 function grade(){
- var score=0,c=0,p=0,s=0;
- document.querySelectorAll(".item").forEach(function(card,idx){var ok=checkOne(card.querySelector(".answer"));if(ok){score++;if(idx<10)c++;else p++}var r=card.querySelector(".result");r.className="result "+(ok?"ok":"bad");r.textContent=ok?"✓ Correct!":"✗ Try again."});
- document.querySelectorAll(".svitem").forEach(function(card){var a=checkOne(card.querySelector(".subject")),b=checkOne(card.querySelector(".verb")),ok=a&&b;if(ok){score++;s++}var r=card.querySelector(".result");r.className="result "+(ok?"ok":"bad");r.textContent=ok?"✓ Correct subject and verb!":"✗ Check the subject and verb."});
- var pct=Math.round(score/30*100),box=document.getElementById("score");box.style.display="block";box.innerHTML='<div class="big">'+score+'/30</div><h2>'+pct+'%</h2><p><b>Contractions:</b> '+c+'/10 &nbsp; • &nbsp; <b>Plurals:</b> '+p+'/10 &nbsp; • &nbsp; <b>Subject & Verb:</b> '+s+'/10</p>';box.scrollIntoView({behavior:"smooth"});
+var score=0,c=0,p=0,s=0,m=[0,0,0];
+document.querySelectorAll(".item").forEach(function(card,idx){var ok=checkInput(card.querySelector(".answer"));if(ok){score++;if(idx<10)c++;else p++}var r=card.querySelector(".result");r.className="result "+(ok?"ok":"bad");r.textContent=ok?"✓ Correct!":"✗ Try again."});
+document.querySelectorAll(".svitem").forEach(function(card){var ok=checkInput(card.querySelector(".subject"))&&checkInput(card.querySelector(".verb"));if(ok){score++;s++}var r=card.querySelector(".result");r.className="result "+(ok?"ok":"bad");r.textContent=ok?"✓ Correct subject and verb!":"✗ Check the subject and verb."});
+matchSets.forEach(function(set,k){set.pairs.forEach(function(pair){if(matchStates[k].some(function(x){return x.lw===pair[0]&&x.rw===pair[1]})){score++;m[k]++}});var r=document.querySelector('.match-card[data-k="'+k+'"] .result');r.className="result "+(m[k]===7?"ok":"bad");r.textContent=m[k]===7?"✓ All 7 matches are correct!":"✗ "+m[k]+"/7 matches are correct."});
+var pct=Math.round(score/51*100),box=document.getElementById("score");box.style.display="block";box.innerHTML='<div class="big">'+score+'/51</div><h2>'+pct+'%</h2><p><b>Contractions:</b> '+c+'/10 + Matching '+m[0]+'/7<br><b>Plurals:</b> '+p+'/10 + Matching '+m[1]+'/7<br><b>Subject & Verb:</b> '+s+'/10 + Matching '+m[2]+'/7</p>';box.scrollIntoView({behavior:"smooth"});
 }
-document.getElementById("checkBtn").addEventListener("click",grade);
-document.getElementById("newBtn").addEventListener("click",function(){render();window.scrollTo({top:0,behavior:"smooth"})});
-render();
+document.getElementById("checkBtn").addEventListener("click",grade);document.getElementById("newBtn").addEventListener("click",function(){render();window.scrollTo({top:0,behavior:"smooth"})});window.addEventListener("resize",function(){[0,1,2].forEach(draw)});render();
 })();
-</script>
-</body></html>
+</script></body></html>
